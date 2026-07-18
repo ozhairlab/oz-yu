@@ -200,13 +200,13 @@ $cnt_pasien = $cnt_semua - $cnt_crm;
         .kunjungan-text { font-size:.83rem; color:var(--text-muted); font-weight:500; }
         .terdaftar-text { font-size:.78rem; color:var(--text-light); }
 
-        /* Action btn */
+        /* Action btn group */
         .btn-detail {
-            padding:6px 13px; border-radius:8px; font-size:.76rem; font-weight:700;
+            padding:6px 11px; border-radius:8px; font-size:.74rem; font-weight:700;
             background:rgba(201,169,110,.1); color:var(--gold-dark);
             border:1px solid rgba(201,169,110,.25); white-space:nowrap;
             transition:all var(--transition);
-            display:inline-flex; align-items:center; gap:5px;
+            display:inline-flex; align-items:center; gap:4px;
         }
         .btn-detail:hover {
             background:linear-gradient(135deg, var(--gold), var(--gold-dark));
@@ -214,6 +214,70 @@ $cnt_pasien = $cnt_semua - $cnt_crm;
             transform:translateY(-1px); box-shadow:0 4px 12px rgba(201,169,110,.3);
         }
         .btn-detail svg { width:12px; height:12px; fill:currentColor; }
+
+        .btn-edit {
+            padding:6px 11px; border-radius:8px; font-size:.74rem; font-weight:700;
+            background:rgba(99,102,241,.08); color:#4f46e5;
+            border:1px solid rgba(99,102,241,.2); white-space:nowrap;
+            transition:all var(--transition);
+            display:inline-flex; align-items:center; gap:4px;
+            text-decoration:none;
+        }
+        .btn-edit:hover {
+            background:#eef2ff; border-color:#6366f1;
+            transform:translateY(-1px); box-shadow:0 4px 12px rgba(99,102,241,.2);
+        }
+        .btn-edit svg { width:12px; height:12px; fill:currentColor; }
+
+        .btn-hapus {
+            padding:6px 11px; border-radius:8px; font-size:.74rem; font-weight:700;
+            background:rgba(239,68,68,.07); color:#dc2626;
+            border:1px solid rgba(239,68,68,.2); white-space:nowrap;
+            transition:all var(--transition);
+            display:inline-flex; align-items:center; gap:4px;
+            cursor:pointer;
+        }
+        .btn-hapus:hover {
+            background:#fef2f2; border-color:#ef4444;
+            transform:translateY(-1px); box-shadow:0 4px 12px rgba(239,68,68,.2);
+        }
+        .btn-hapus svg { width:12px; height:12px; fill:currentColor; }
+
+        .aksi-group { display:flex; gap:5px; align-items:center; flex-wrap:nowrap; }
+
+        /* Modal hapus */
+        .modal-overlay {
+            display:none; position:fixed; inset:0;
+            background:rgba(5,5,15,.7); backdrop-filter:blur(4px);
+            z-index:900; align-items:center; justify-content:center;
+        }
+        .modal-overlay.show { display:flex; }
+
+        .modal-box {
+            background:var(--surface); border-radius:var(--radius-md);
+            padding:32px 28px; max-width:400px; width:90%;
+            box-shadow:0 32px 80px rgba(0,0,0,.3);
+            border:1px solid var(--border);
+            animation:modalIn .2s ease;
+        }
+
+        @keyframes modalIn {
+            from { opacity:0; transform:scale(.95) translateY(10px); }
+            to   { opacity:1; transform:scale(1) translateY(0); }
+        }
+
+        .modal-icon {
+            width:52px; height:52px; border-radius:50%;
+            background:#fef2f2; border:1px solid #fecaca;
+            display:flex; align-items:center; justify-content:center;
+            margin:0 auto 16px;
+        }
+        .modal-icon svg { width:24px; height:24px; fill:#ef4444; }
+        .modal-title { font-size:1.05rem; font-weight:800; color:var(--text); text-align:center; margin-bottom:8px; }
+        .modal-sub   { font-size:.85rem; color:var(--text-muted); text-align:center; line-height:1.6; margin-bottom:22px; }
+        .modal-nama  { font-weight:700; color:var(--text); }
+        .modal-actions { display:flex; gap:10px; }
+        .modal-actions .btn { flex:1; justify-content:center; }
 
         /* Toolbar */
         .toolbar { display:flex; align-items:center; gap:10px; margin-bottom:20px; flex-wrap:wrap; }
@@ -284,6 +348,12 @@ $cnt_pasien = $cnt_semua - $cnt_crm;
     </div>
 
     <!-- Stat strip -->
+    <?php if (!empty($_GET['deleted'])): ?>
+    <div class="alert alert-success" style="margin-bottom:18px;">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14l-4-4 1.41-1.41L10 13.17l6.59-6.59L18 8l-8 8z"/></svg>
+        <div>Pasien <strong><?= htmlspecialchars($_GET['nama'] ?? '') ?></strong> berhasil dihapus.</div>
+    </div>
+    <?php endif; ?>
     <div class="stat-strip">
         <div class="stat-strip-item">
             <div class="stat-strip-val"><?= number_format($cnt_semua) ?></div>
@@ -423,11 +493,21 @@ $cnt_pasien = $cnt_semua - $cnt_crm;
                         </td>
                         <td class="terdaftar-text"><?= date('d M Y', strtotime($p['created_at'])) ?></td>
                         <td>
-                            <a href="detail_pasien.php?id=<?= $p['id'] ?>" class="btn-detail"
-                               onclick="event.stopPropagation()">
-                                <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
-                                Lihat
-                            </a>
+                            <div class="aksi-group" onclick="event.stopPropagation()">
+                                <a href="detail_pasien.php?id=<?= $p['id'] ?>" class="btn-detail">
+                                    <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                                    Lihat
+                                </a>
+                                <a href="edit_pasien.php?id=<?= $p['id'] ?>" class="btn-edit">
+                                    <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                                    Edit
+                                </a>
+                                <button type="button" class="btn-hapus"
+                                        onclick="konfirmasiHapus(<?= $p['id'] ?>, '<?= htmlspecialchars(addslashes($p['nama']), ENT_QUOTES) ?>')">
+                                    <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                                    Hapus
+                                </button>
+                            </div>
                         </td>
                     </tr>
                     <?php endforeach; ?>
@@ -457,6 +537,32 @@ $cnt_pasien = $cnt_semua - $cnt_crm;
     </div>
 </div>
 
+<!-- Modal Konfirmasi Hapus -->
+<div class="modal-overlay" id="modalHapus">
+    <div class="modal-box">
+        <div class="modal-icon">
+            <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+        </div>
+        <div class="modal-title">Hapus Pasien?</div>
+        <div class="modal-sub">
+            Anda akan menghapus pasien <span class="modal-nama" id="modal-nama-text"></span>.<br>
+            Seluruh riwayat treatment dan foto akan ikut terhapus.<br>
+            <strong style="color:#dc2626;">Tindakan ini tidak bisa dibatalkan.</strong>
+        </div>
+        <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" onclick="tutupModal()">Batal</button>
+            <form method="POST" action="hapus_pasien.php" style="flex:1;">
+                <input type="hidden" name="id" id="modal-hapus-id">
+                <input type="hidden" name="redirect" value="<?= htmlspecialchars($_SERVER['REQUEST_URI']) ?>">
+                <button type="submit" class="btn" style="width:100%;justify-content:center;background:#dc2626;color:#fff;box-shadow:0 4px 12px rgba(220,38,38,.3);">
+                    <svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:#fff"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                    Ya, Hapus
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
 (function(){
     const sidebar = document.getElementById('sidebar');
@@ -468,6 +574,26 @@ $cnt_pasien = $cnt_semua - $cnt_crm;
         sidebar.classList.remove('open'); overlay.classList.remove('show');
     });
 }());
+
+function konfirmasiHapus(id, nama) {
+    document.getElementById('modal-hapus-id').value = id;
+    document.getElementById('modal-nama-text').textContent = nama;
+    document.getElementById('modalHapus').classList.add('show');
+    document.body.style.overflow = 'hidden';
+}
+
+function tutupModal() {
+    document.getElementById('modalHapus').classList.remove('show');
+    document.body.style.overflow = '';
+}
+
+document.getElementById('modalHapus').addEventListener('click', function(e){
+    if (e.target === this) tutupModal();
+});
+
+document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape') tutupModal();
+});
 </script>
 </body>
 </html>
