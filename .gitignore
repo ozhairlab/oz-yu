@@ -1,0 +1,29 @@
+# ============================================================
+#  .gitignore — Ozthetique Klinik
+# ============================================================
+
+# Kredensial database (JANGAN pernah di-commit)
+koneksi.php
+
+# File SQL yang mengandung kredensial hosting
+u666289223_fileadmin.sql
+
+# Folder upload foto pasien (data sensitif + file besar)
+uploads/pasien_*/
+
+# Folder setup sementara
+setup/
+
+# File OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Log
+*.log
