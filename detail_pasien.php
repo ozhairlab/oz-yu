@@ -376,6 +376,22 @@ $active_menu     = 'pasien';
             .profile-nama { font-size: 1.25rem; }
             .profile-avatar-lg { width: 60px; height: 60px; font-size: 1.4rem; }
         }
+        
+        .lightbox-nav {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            background: rgba(255,255,255,0.2); border: none; color: #fff;
+            width: 50px; height: 50px; border-radius: 50%;
+            font-size: 24px; cursor: pointer; z-index: 10000;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s;
+        }
+        .lightbox-nav:hover { background: rgba(255,255,255,0.4); }
+        .lightbox-prev { left: 20px; }
+        .lightbox-next { right: 20px; }
+        .lightbox-img-wrapper {
+            position: relative; display: flex; align-items: center; justify-content: center;
+            width: 100%; height: 100%; overflow: hidden; touch-action: none;
+        }
     </style>
 </head>
 <body>
@@ -615,7 +631,8 @@ $active_menu     = 'pasien';
                                     <img src="uploads/<?= htmlspecialchars($f['nama_file']) ?>"
                                          alt="Before <?= htmlspecialchars($t['nama_treatment']) ?>"
                                          loading="lazy"
-                                         onclick="bukaLightbox(this.src)">
+                                         class="lb-image"
+                                         onclick="bukaLightbox(this)">
                                     <?php if ($jml_before > 1): ?>
                                         <span class="foto-thumb-num"><?= $bi + 1 ?></span>
                                     <?php endif; ?>
@@ -635,7 +652,8 @@ $active_menu     = 'pasien';
                                     <img src="uploads/<?= htmlspecialchars($f['nama_file']) ?>"
                                          alt="After <?= htmlspecialchars($t['nama_treatment']) ?>"
                                          loading="lazy"
-                                         onclick="bukaLightbox(this.src)">
+                                         class="lb-image"
+                                         onclick="bukaLightbox(this)">
                                     <?php if ($jml_after > 1): ?>
                                         <span class="foto-thumb-num"><?= $ai + 1 ?></span>
                                     <?php endif; ?>
@@ -660,7 +678,11 @@ $active_menu     = 'pasien';
 <!-- Lightbox -->
 <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Pratinjau foto">
     <button class="lightbox-close" id="lightbox-close" aria-label="Tutup">&times;</button>
-    <img id="lightbox-img" src="" alt="Foto treatment">
+    <button class="lightbox-nav lightbox-prev" id="lightbox-prev" aria-label="Sebelumnya">❮</button>
+    <button class="lightbox-nav lightbox-next" id="lightbox-next" aria-label="Selanjutnya">❯</button>
+    <div class="lightbox-img-wrapper" id="lb-wrapper">
+        <img id="lightbox-img" src="" alt="Foto treatment" draggable="false" style="transition: transform 0.2s; user-select: none;">
+    </div>
 </div>
 
 <script>
@@ -675,26 +697,101 @@ $active_menu     = 'pasien';
         sidebar.classList.remove('open'); overlay.classList.remove('show');
     });
 
-    /* Lightbox */
+    /* Lightbox Gallery */
     const lightbox = document.getElementById('lightbox');
     const lbImg    = document.getElementById('lightbox-img');
     const lbClose  = document.getElementById('lightbox-close');
+    const lbPrev   = document.getElementById('lightbox-prev');
+    const lbNext   = document.getElementById('lightbox-next');
+    const lbWrapper= document.getElementById('lb-wrapper');
+    
+    let images = [];
+    let currentIndex = 0;
 
-    window.bukaLightbox = function (src) {
-        lbImg.src = src;
+    window.bukaLightbox = function (imgEl) {
+        images = Array.from(document.querySelectorAll('.lb-image'));
+        currentIndex = images.indexOf(imgEl);
+        if (currentIndex === -1) currentIndex = 0;
+        
+        updateLightbox();
         lightbox.classList.add('aktif');
         document.body.style.overflow = 'hidden';
     };
+
+    function updateLightbox() {
+        if (images.length === 0) return;
+        lbImg.src = images[currentIndex].src;
+        lbPrev.style.display = images.length > 1 ? 'flex' : 'none';
+        lbNext.style.display = images.length > 1 ? 'flex' : 'none';
+        lbImg.style.transform = 'translateX(0)';
+    }
 
     function tutupLightbox() {
         lightbox.classList.remove('aktif');
         lbImg.src = '';
         document.body.style.overflow = '';
     }
+    
+    function showNext() {
+        if (images.length <= 1) return;
+        currentIndex = (currentIndex + 1) % images.length;
+        updateLightbox();
+    }
+    
+    function showPrev() {
+        if (images.length <= 1) return;
+        currentIndex = (currentIndex - 1 + images.length) % images.length;
+        updateLightbox();
+    }
 
     lbClose.addEventListener('click', tutupLightbox);
-    lightbox.addEventListener('click', function (e) { if (e.target === lightbox) tutupLightbox(); });
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') tutupLightbox(); });
+    lbPrev.addEventListener('click', (e) => { e.stopPropagation(); showPrev(); });
+    lbNext.addEventListener('click', (e) => { e.stopPropagation(); showNext(); });
+    
+    lightbox.addEventListener('click', function (e) { 
+        if (e.target === lightbox || e.target === lbWrapper) tutupLightbox(); 
+    });
+    
+    document.addEventListener('keydown', function (e) { 
+        if (!lightbox.classList.contains('aktif')) return;
+        if (e.key === 'Escape') tutupLightbox(); 
+        if (e.key === 'ArrowRight') showNext();
+        if (e.key === 'ArrowLeft') showPrev();
+    });
+    
+    // Swipe / Drag logic
+    let startX = 0;
+    let isDragging = false;
+    
+    function dragStart(x) {
+        isDragging = true;
+        startX = x;
+        lbImg.style.transition = 'none';
+    }
+    function dragMove(x) {
+        if (!isDragging) return;
+        let diff = x - startX;
+        lbImg.style.transform = `translateX(${diff}px)`;
+    }
+    function dragEnd(x) {
+        if (!isDragging) return;
+        isDragging = false;
+        lbImg.style.transition = 'transform 0.2s';
+        let diff = x - startX;
+        if (diff < -50) showNext();
+        else if (diff > 50) showPrev();
+        else lbImg.style.transform = 'translateX(0)';
+    }
+
+    lbWrapper.addEventListener('mousedown', e => dragStart(e.clientX));
+    lbWrapper.addEventListener('mousemove', e => dragMove(e.clientX));
+    lbWrapper.addEventListener('mouseup', e => dragEnd(e.clientX));
+    lbWrapper.addEventListener('mouseleave', e => { if (isDragging) dragEnd(e.clientX); });
+    
+    lbWrapper.addEventListener('touchstart', e => dragStart(e.touches[0].clientX));
+    lbWrapper.addEventListener('touchmove', e => dragMove(e.touches[0].clientX));
+    lbWrapper.addEventListener('touchend', e => dragEnd(e.changedTouches[0].clientX));
+
 }());
 
 /* Accordion kunjungan */
