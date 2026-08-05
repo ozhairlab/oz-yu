@@ -464,6 +464,7 @@ $active_tab = (int)($_GET['tab'] ?? $divisi_list[0]['id'] ?? 1);
                                                         <?= (float)$p['harga'] ?>)">
                                                     Edit
                                                 </button>
+                                                <a href="komposisi.php?id=<?= $p['id'] ?>" class="btn btn-sm" style="background:#fff7ed; color:#ea580c; border:1px solid #ffedd5; text-decoration:none;">Bahan</a>
                                                 <form method="POST" style="display:inline"
                                                       onsubmit="return confirm('Ubah status perawatan ini?')">
                                                     <input type="hidden" name="aksi" value="toggle">

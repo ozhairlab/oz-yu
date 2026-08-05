@@ -61,27 +61,67 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['aksi']) && $_POST['ak
             // Generate No Transaksi: TRX-YYYYMMDD-His
             $no_transaksi = 'TRX-' . date('Ymd-His') . '-' . rand(10,99);
             
-            // Insert transaksi
-            $stmt = $koneksi->prepare('INSERT INTO transaksi (no_transaksi, pasien_id, kasir_id, subtotal, diskon, grand_total, metode_pembayaran, status) VALUES (?, ?, ?, ?, ?, ?, ?, "Lunas")');
-            $stmt->bind_param('siiddds', $no_transaksi, $pasien_id, $kasir_id, $subtotal, $diskon, $grand_total, $metode);
-            
-            if ($stmt->execute()) {
+            $koneksi->begin_transaction();
+            try {
+                // Insert transaksi
+                $stmt = $koneksi->prepare('INSERT INTO transaksi (no_transaksi, pasien_id, kasir_id, subtotal, diskon, grand_total, metode_pembayaran, status) VALUES (?, ?, ?, ?, ?, ?, ?, "Lunas")');
+                $stmt->bind_param('siiddds', $no_transaksi, $pasien_id, $kasir_id, $subtotal, $diskon, $grand_total, $metode);
+                
+                if (!$stmt->execute()) {
+                    throw new Exception('Gagal menyimpan transaksi: ' . $stmt->error);
+                }
                 $trx_id = $stmt->insert_id;
                 $stmt->close();
                 
-                // Insert detail
+                // Insert detail & Potong stok bahan
                 $stmt_dtl = $koneksi->prepare('INSERT INTO transaksi_detail (transaksi_id, perawatan_id, nama_perawatan, harga_satuan, qty, subtotal) VALUES (?, ?, ?, ?, ?, ?)');
+                $stmt_komposisi = $koneksi->prepare('SELECT barang_id, jumlah_pakai FROM komposisi_perawatan WHERE perawatan_id = ?');
+                
                 foreach ($items_to_insert as $it) {
                     $stmt_dtl->bind_param('iisdid', $trx_id, $it['perawatan_id'], $it['nama'], $it['harga'], $it['qty'], $it['subtotal']);
                     $stmt_dtl->execute();
+                    
+                    // Potong stok
+                    $stmt_komposisi->bind_param('i', $it['perawatan_id']);
+                    $stmt_komposisi->execute();
+                    $res_komposisi = $stmt_komposisi->get_result();
+                    while($komp = $res_komposisi->fetch_assoc()) {
+                        $barang_id = $komp['barang_id'];
+                        $total_pakai = $komp['jumlah_pakai'] * $it['qty'];
+                        
+                        // Update stok
+                        $upd_stok = $koneksi->prepare('UPDATE inventory_barang SET stok_sekarang = stok_sekarang - ? WHERE id = ?');
+                        $upd_stok->bind_param('ii', $total_pakai, $barang_id);
+                        $upd_stok->execute();
+                        $upd_stok->close();
+                        
+                        // Ambil stok akhir untuk riwayat
+                        $sel_stok = $koneksi->prepare('SELECT stok_sekarang FROM inventory_barang WHERE id = ?');
+                        $sel_stok->bind_param('i', $barang_id);
+                        $sel_stok->execute();
+                        $stok_akhir = $sel_stok->get_result()->fetch_row()[0];
+                        $sel_stok->close();
+                        
+                        // Catat riwayat
+                        $tipe = 'terpakai';
+                        $ket = 'Terpakai otomatis utk TRX ' . $no_transaksi;
+                        $ins_riwayat = $koneksi->prepare('INSERT INTO inventory_riwayat (barang_id, tipe, jumlah, stok_akhir, keterangan, user_id) VALUES (?, ?, ?, ?, ?, ?)');
+                        $ins_riwayat->bind_param('isiisi', $barang_id, $tipe, $total_pakai, $stok_akhir, $ket, $kasir_id);
+                        $ins_riwayat->execute();
+                        $ins_riwayat->close();
+                    }
                 }
                 $stmt_dtl->close();
+                $stmt_komposisi->close();
+                
+                $koneksi->commit();
                 
                 // Redirect ke struk
                 header("Location: struk.php?id=$trx_id");
                 exit;
-            } else {
-                $errors[] = 'Gagal menyimpan transaksi: ' . $stmt->error;
+            } catch (Exception $e) {
+                $koneksi->rollback();
+                $errors[] = $e->getMessage();
             }
         } else {
             $errors[] = 'Tidak ada item valid di keranjang.';

@@ -113,6 +113,14 @@ $admin_init  = strtoupper(mb_substr($_SESSION['admin_username'] ?? 'A', 0, 1));
             <span class="nav-label">Master Perawatan</span>
         </a>
 
+        <a href="inventory.php"
+           class="nav-item <?= $active_menu === 'inventory' ? 'active' : '' ?>">
+            <span class="nav-icon">
+                <svg viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7zm-4 6h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
+            </span>
+            <span class="nav-label">Inventory Bahan</span>
+        </a>
+
         <a href="users.php"
            class="nav-item <?= $active_menu === 'users' ? 'active' : '' ?>">
             <span class="nav-icon">
