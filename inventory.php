@@ -221,7 +221,7 @@ if ($active_tab === 'mutasi') {
     $sql_riwayat = "SELECT r.*, b.nama AS nama_barang, b.kode, u.username 
                     FROM inventory_riwayat r 
                     JOIN inventory_barang b ON b.id = r.barang_id 
-                    LEFT JOIN users u ON u.id = r.user_id 
+                    LEFT JOIN admin_klinik u ON u.id = r.user_id 
                     ORDER BY r.created_at DESC LIMIT 500";
     $res_riwayat = $koneksi->query($sql_riwayat);
     while ($row = $res_riwayat->fetch_assoc()) {
@@ -240,7 +240,7 @@ if ($active_tab === 'mutasi') {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        .page-wrap { padding: 40px; margin-left: 260px; min-height: 100vh; background: var(--bg, #f8f9fa); }
+        .page-wrap { padding: 90px 40px 40px; margin-left: 260px; min-height: 100vh; background: var(--bg, #f8f9fa); }
         .page-title { font-size: 1.8rem; margin: 0; font-weight: 800; letter-spacing: -0.03em; color: var(--text, #111827); }
         .page-subtitle { color: #6b7280; font-size: 1rem; margin-top: 5px; }
 
@@ -318,8 +318,9 @@ if ($active_tab === 'mutasi') {
         .modal-title { margin: 0; font-size: 1.25rem; font-weight: 700; color: #111827; }
         .close-btn { background: #f3f4f6; border: none; width: 32px; height: 32px; border-radius: 50%; color: #6b7280; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
         .close-btn:hover { background: #e5e7eb; color: #111827; }
-        .modal-body { padding: 24px; overflow-y: auto; }
-        .modal-footer { padding: 20px 24px; border-top: 1px solid #f3f4f6; background: #f9fafb; display: flex; justify-content: flex-end; gap: 12px; }
+        form.modal-form { display: flex; flex-direction: column; flex: 1; overflow: hidden; margin: 0; }
+        .modal-body { padding: 24px; overflow-y: auto; flex: 1; }
+        .modal-footer { padding: 20px 24px; border-top: 1px solid #f3f4f6; background: #f9fafb; display: flex; justify-content: flex-end; gap: 12px; flex-shrink: 0; }
         
         .form-group { margin-bottom: 18px; }
         .form-label { display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 8px; color: #374151; }
@@ -568,7 +569,7 @@ if ($active_tab === 'mutasi') {
                     <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
             </div>
-            <form method="POST" action="inventory.php">
+            <form method="POST" action="inventory.php" class="modal-form">
                 <div class="modal-body">
                     <input type="hidden" name="aksi" id="formAksi" value="tambah">
                     <input type="hidden" name="id" id="formId" value="0">
@@ -618,7 +619,7 @@ if ($active_tab === 'mutasi') {
                     <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
             </div>
-            <form method="POST" action="inventory.php">
+            <form method="POST" action="inventory.php" class="modal-form">
                 <div class="modal-body">
                     <input type="hidden" name="aksi" value="adjust_stok">
                     <input type="hidden" name="id" id="stokId" value="">
@@ -656,7 +657,7 @@ if ($active_tab === 'mutasi') {
                     Hapus Barang
                 </h3>
             </div>
-            <form method="POST" action="inventory.php">
+            <form method="POST" action="inventory.php" class="modal-form">
                 <div class="modal-body">
                     <p style="color: #4b5563; font-size: 0.95rem; margin: 0; line-height: 1.5;">Apakah Anda yakin ingin menghapus barang <strong id="hapusNama" style="color: #111827;"></strong> secara permanen dari inventory? Tindakan ini tidak dapat dibatalkan.</p>
                     
