@@ -134,25 +134,7 @@ $role_colors = [
     <link rel="stylesheet" href="assets/style.css">
     <style>
         /* Gaya dasar diadaptasi dari UI Ozthetique */
-        :root {
-            --bg: #0a0a0f;
-            --surface: #12121a;
-            --surface-hover: #1c1c28;
-            --border: rgba(255,255,255,0.08);
-            --text: #ffffff;
-            --muted: rgba(255,255,255,0.5);
-            --gold: #c9a96e;
-            --radius: 12px;
-        }
-        
-        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow-x: hidden; }
-        
-        .main-content {
-            margin-left: 260px; /* Lebar sidebar */
-            padding: 40px;
-            min-height: 100vh;
-        }
-        
+        .main-content { margin-left: 260px; padding: 40px; min-height: 100vh; }
         .header-action { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         .page-title { font-size: 1.8rem; margin: 0; font-weight: 700; letter-spacing: -0.03em; }
         
@@ -172,24 +154,25 @@ $role_colors = [
         }
         .btn:hover { transform: translateY(-2px); }
         .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
-        .btn-danger { background: rgba(239,68,68,0.1); color: #fca5a5; border: 1px solid rgba(239,68,68,0.2); }
+        .btn-danger { background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); }
         .btn-danger:hover { background: rgba(239,68,68,0.2); }
         .btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
-        .btn-ghost:hover { background: var(--surface-hover); }
+        .btn-ghost:hover { background: var(--surface-2); }
         
         .table-wrap {
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: var(--radius);
+            border-radius: var(--radius-md);
             overflow: hidden;
+            box-shadow: var(--shadow-sm);
         }
         
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 16px 20px; text-align: left; border-bottom: 1px solid var(--border); }
-        th { background: rgba(255,255,255,0.02); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
-        td { font-size: 0.95rem; }
+        th { background: var(--surface-2); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); }
+        td { font-size: 0.95rem; color: var(--text); }
         tr:last-child td { border-bottom: none; }
-        tr:hover td { background: rgba(255,255,255,0.02); }
+        tr:hover td { background: rgba(0,0,0,0.02); }
         
         .role-badge {
             display: inline-block;

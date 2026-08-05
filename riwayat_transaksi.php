@@ -43,30 +43,24 @@ $stmt->close();
     <title><?= $page_title ?> — Ozthetique</title>
     <link rel="stylesheet" href="assets/style.css">
     <style>
-        :root {
-            --bg: #0a0a0f; --surface: #12121a; --surface-hover: #1c1c28;
-            --border: rgba(255,255,255,0.08); --text: #ffffff; --muted: rgba(255,255,255,0.5);
-            --gold: #c9a96e; --radius: 12px;
-        }
-        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow-x: hidden; }
-        
         .main-content { margin-left: 260px; padding: 40px; min-height: 100vh; }
         .header-action { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px; }
         .page-title { font-size: 1.8rem; margin: 0; font-weight: 700; letter-spacing: -0.03em; }
         
         .filter-box { display: flex; align-items: center; gap: 10px; background: var(--surface); padding: 10px 16px; border-radius: 8px; border: 1px solid var(--border); }
-        .filter-input { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 6px; font-family: inherit; color-scheme: dark; }
-        .btn-filter { background: var(--surface-hover); border: 1px solid var(--border); color: var(--text); padding: 8px 16px; border-radius: 6px; cursor: pointer; }
+        .filter-input { background: transparent; border: none; color: var(--text); outline: none; font-family: inherit; font-size: 0.95rem; }
+        .filter-input::-webkit-calendar-picker-indicator { filter: invert(0.5); opacity: 0.7; }
+        .btn-filter { background: var(--surface-secondary); border: 1px solid var(--border); color: var(--text); padding: 8px 16px; border-radius: 6px; cursor: pointer; }
         .btn-filter:hover { background: var(--border); }
         
-        .stat-card { background: linear-gradient(135deg, rgba(201,169,110,0.1), transparent); border: 1px solid rgba(201,169,110,0.3); padding: 24px; border-radius: var(--radius); margin-bottom: 30px; display: inline-block; min-width: 250px; }
-        .stat-label { font-size: 0.85rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
-        .stat-value { font-size: 2rem; font-weight: 800; color: var(--gold); }
+        .stat-card { background: var(--surface); border: 1px solid var(--border); padding: 24px; border-radius: var(--radius); margin-bottom: 30px; display: inline-block; min-width: 250px; }
+        .stat-label { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+        .stat-value { font-size: 2rem; font-weight: 800; color: var(--primary); }
         
         .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; white-space: nowrap; }
         th, td { padding: 16px 20px; text-align: left; border-bottom: 1px solid var(--border); }
-        th { background: rgba(255,255,255,0.02); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+        th { background: var(--surface-secondary); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); }
         td { font-size: 0.95rem; }
         tr:last-child td { border-bottom: none; }
         tr:hover td { background: rgba(255,255,255,0.02); }

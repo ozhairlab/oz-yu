@@ -120,13 +120,6 @@ $katalog_json = json_encode($katalog);
     <title><?= $page_title ?> — Ozthetique</title>
     <link rel="stylesheet" href="assets/style.css">
     <style>
-        :root {
-            --bg: #0a0a0f; --surface: #12121a; --surface-hover: #1c1c28;
-            --border: rgba(255,255,255,0.08); --text: #ffffff; --muted: rgba(255,255,255,0.5);
-            --gold: #c9a96e; --radius: 12px;
-        }
-        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
-        
         .pos-layout {
             display: flex; flex: 1; overflow: hidden;
             margin-left: 260px; /* Sidebar width */
@@ -143,29 +136,29 @@ $katalog_json = json_encode($katalog);
         .search-box { position: relative; }
         .search-input { width: 100%; padding: 12px 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 0.95rem; box-sizing: border-box; }
         .search-input:focus { outline: none; border-color: var(--gold); }
-        .search-results { position: absolute; top: 100%; left: 0; right: 0; background: var(--surface-hover); border: 1px solid var(--border); border-radius: 8px; max-height: 200px; overflow-y: auto; z-index: 20; display: none; margin-top: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+        .search-results { position: absolute; top: 100%; left: 0; right: 0; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; max-height: 200px; overflow-y: auto; z-index: 20; display: none; margin-top: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         .search-item { padding: 12px 16px; cursor: pointer; border-bottom: 1px solid var(--border); }
-        .search-item:hover { background: rgba(255,255,255,0.05); }
-        .search-item strong { display: block; color: var(--gold); }
-        .search-item small { color: var(--muted); }
+        .search-item:hover { background: rgba(0,0,0,0.02); }
+        .search-item strong { display: block; color: var(--gold-dark); }
+        .search-item small { color: var(--text-muted); }
         
         .selected-patient { background: rgba(201,169,110,0.1); border: 1px solid rgba(201,169,110,0.3); padding: 12px 16px; border-radius: 8px; display: none; align-items: center; justify-content: space-between; margin-top: 10px; }
-        .patient-name { font-weight: 600; color: var(--gold); }
-        .btn-clear { background: none; border: none; color: #fca5a5; cursor: pointer; font-size: 0.8rem; }
+        .patient-name { font-weight: 600; color: var(--gold-dark); }
+        .btn-clear { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 0.8rem; font-weight: bold; }
         
         .cart-items { flex: 1; overflow-y: auto; padding: 20px; }
         .cart-item { display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; margin-bottom: 16px; border-bottom: 1px dashed var(--border); }
         .item-info { flex: 1; }
         .item-name { font-weight: 600; font-size: 0.95rem; margin-bottom: 4px; }
-        .item-price { color: var(--muted); font-size: 0.85rem; }
+        .item-price { color: var(--text-muted); font-size: 0.85rem; }
         .item-controls { display: flex; align-items: center; gap: 12px; }
-        .qty-btn { background: var(--surface-hover); border: 1px solid var(--border); color: var(--text); width: 28px; height: 28px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .qty-btn { background: var(--surface-2); border: 1px solid var(--border); color: var(--text); width: 28px; height: 28px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .qty-btn:hover { background: var(--border); }
         .item-sub { font-weight: 700; width: 80px; text-align: right; }
         
-        .cart-footer { padding: 20px; background: rgba(0,0,0,0.2); border-top: 1px solid var(--border); }
-        .summary-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; color: var(--muted); }
-        .summary-row.total { font-size: 1.2rem; font-weight: 800; color: var(--gold); margin-top: 15px; margin-bottom: 20px; border-top: 1px solid var(--border); padding-top: 15px; }
+        .cart-footer { padding: 20px; background: rgba(0,0,0,0.02); border-top: 1px solid var(--border); }
+        .summary-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; color: var(--text-muted); }
+        .summary-row.total { font-size: 1.2rem; font-weight: 800; color: var(--gold-dark); margin-top: 15px; margin-bottom: 20px; border-top: 1px solid var(--border); padding-top: 15px; }
         
         .form-control { width: 100%; padding: 10px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: inherit; margin-top: 5px; box-sizing: border-box;}
         
