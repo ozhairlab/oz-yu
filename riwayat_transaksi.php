@@ -41,6 +41,7 @@ $stmt->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $page_title ?> — Ozthetique</title>
+    <link rel="stylesheet" href="assets/style.css">
     <style>
         :root {
             --bg: #0a0a0f; --surface: #12121a; --surface-hover: #1c1c28;
