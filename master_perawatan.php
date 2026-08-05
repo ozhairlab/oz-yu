@@ -385,7 +385,7 @@ $active_tab = (int)($_GET['tab'] ?? $divisi_list[0]['id'] ?? 1);
                     <a href="?tab=<?= $d['id'] ?>"
                        class="divisi-tab <?= $cls_tab ?>"
                        style="--tab-color:<?= htmlspecialchars($warna) ?>;--tab-bg:<?= htmlspecialchars(ui_hex_alpha($warna, '14')) ?>;--tab-border:<?= htmlspecialchars(ui_hex_alpha($warna, '33')) ?>;">
-                        <span class="tab-dot" style="background:<?= htmlspecialchars($d['warna']) ?>"></span>
+                        <span class="tab-dot" style="background:<?= htmlspecialchars($warna) ?>"></span>
                         <?= htmlspecialchars($d['nama']) ?>
                         <span style="font-size:.7rem;opacity:.7">(<?= $total ?>)</span>
                     </a>

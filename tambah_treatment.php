@@ -475,10 +475,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <button type="button" class="divisi-btn <?= $cls ?>"
                                     data-divisi-id="<?= $d['id'] ?>"
                                     data-kode="<?= $d['kode'] ?>"
-                                    data-warna="<?= htmlspecialchars($d['warna']) ?>"
+                                    data-warna="<?= htmlspecialchars($warna) ?>"
                                     style="--btn-bg:<?= htmlspecialchars(ui_hex_alpha($warna, '14')) ?>;--btn-color:<?= htmlspecialchars($warna) ?>;"
                                     onclick="switchDivisi(this)">
-                                <span class="d-dot" style="background:<?= htmlspecialchars($d['warna']) ?>"></span>
+                                <span class="d-dot" style="background:<?= htmlspecialchars($warna) ?>"></span>
                                 <?= htmlspecialchars($d['nama']) ?>
                             </button>
                         <?php endforeach; ?>
