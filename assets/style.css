@@ -825,6 +825,14 @@ textarea.form-control { resize: vertical; min-height: 112px; }
 
 .badge-hair .dot { background: #8b5cf6; }
 
+.badge-generic {
+    background: rgba(100,116,139,.12);
+    color: #334155;
+    border: 1px solid rgba(100,116,139,.22);
+}
+
+.badge-generic .dot { background: currentColor; }
+
 /* ============================================================
    LIGHTBOX
    ============================================================ */

@@ -266,8 +266,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                       transition:background .2s, color .2s; color:#999; }
         .divisi-btn + .divisi-btn { border-left:1.5px solid var(--border); }
         .divisi-btn .d-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
-        .divisi-btn.active-oz   { background:#fce4ec; color:#c2185b; }
-        .divisi-btn.active-hair { background:#ede7f6; color:#6a1b9a; }
+        .divisi-btn.is-active {
+            background: var(--btn-bg, #f1f5f9);
+            color: var(--btn-color, #334155);
+        }
 
         .perawatan-panel { display:none; }
         .perawatan-panel.show { display:block; }
@@ -276,8 +278,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .chip { padding:5px 13px; border-radius:50px; font-size:.76rem; font-weight:600;
                 cursor:pointer; border:1.5px solid var(--border); background:#f4f4f8;
                 color:#555; transition:all .15s; user-select:none; }
-        .chip.oz:hover,  .chip.oz.selected  { background:#fce4ec; color:#e91e63; border-color:#f8bbd0; }
-        .chip.hair:hover,.chip.hair.selected { background:#ede7f6; color:#7c4dff; border-color:#d1c4e9; }
+        .chip:hover, .chip.selected {
+            background: var(--chip-bg, #f1f5f9);
+            color: var(--chip-color, #334155);
+            border-color: var(--chip-border, #cbd5e1);
+        }
 
         /* ---- Multi-upload area ---- */
         .foto-section { margin-bottom:22px; }
@@ -463,14 +468,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <label class="form-label">Divisi Perawatan <span class="req">*</span></label>
                     <div class="divisi-switcher">
                         <?php foreach ($divisi_list as $d):
-                            $isOz   = $d['kode'] === 'ozthetique';
                             $active = ((int)$old['divisi_id'] === (int)$d['id']);
-                            $cls    = $active ? ($isOz ? 'active-oz' : 'active-hair') : '';
+                            $warna  = ui_hex($d['warna'], '#64748b');
+                            $cls    = $active ? 'is-active' : '';
                         ?>
                             <button type="button" class="divisi-btn <?= $cls ?>"
                                     data-divisi-id="<?= $d['id'] ?>"
                                     data-kode="<?= $d['kode'] ?>"
                                     data-warna="<?= htmlspecialchars($d['warna']) ?>"
+                                    style="--btn-bg:<?= htmlspecialchars(ui_hex_alpha($warna, '14')) ?>;--btn-color:<?= htmlspecialchars($warna) ?>;"
                                     onclick="switchDivisi(this)">
                                 <span class="d-dot" style="background:<?= htmlspecialchars($d['warna']) ?>"></span>
                                 <?= htmlspecialchars($d['nama']) ?>
@@ -500,10 +506,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <!-- Panel chips perawatan per divisi -->
                 <?php foreach ($divisi_list as $d):
-                    $isOz    = $d['kode'] === 'ozthetique';
                     $visible = ((int)$old['divisi_id'] === (int)$d['id']);
                     $list    = $perawatan_per_divisi[$d['id']] ?? [];
-                    $chipCls = $isOz ? 'oz' : 'hair';
+                    $warna   = ui_hex($d['warna'], '#64748b');
                 ?>
                 <div class="perawatan-panel <?= $visible ? 'show' : '' ?>"
                      id="panel-<?= $d['id'] ?>" data-divisi="<?= $d['id'] ?>">
@@ -512,7 +517,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <p style="font-size:.74rem;color:#aaa;margin-bottom:6px;">Pilih cepat:</p>
                             <div class="chips">
                                 <?php foreach ($list as $item): ?>
-                                    <span class="chip <?= $chipCls ?>"
+                                    <span class="chip"
+                                          style="--chip-bg:<?= htmlspecialchars(ui_hex_alpha($warna, '14')) ?>;--chip-color:<?= htmlspecialchars($warna) ?>;--chip-border:<?= htmlspecialchars(ui_hex_alpha($warna, '33')) ?>;"
                                           onclick="pilihTreatment(this)">
                                         <?= htmlspecialchars($item['nama']) ?>
                                     </span>
@@ -700,14 +706,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 /* ---- Divisi switcher ---- */
 function switchDivisi(btn) {
     var id    = parseInt(btn.getAttribute('data-divisi-id'));
-    var kode  = btn.getAttribute('data-kode');
     var warna = btn.getAttribute('data-warna');
 
     document.getElementById('divisi_id_input').value = id;
     document.querySelectorAll('.divisi-btn').forEach(function (b) {
-        b.classList.remove('active-oz','active-hair');
+        b.classList.remove('is-active');
     });
-    btn.classList.add(kode === 'ozthetique' ? 'active-oz' : 'active-hair');
+    btn.classList.add('is-active');
     document.querySelectorAll('.perawatan-panel').forEach(function (p) {
         p.classList.toggle('show', parseInt(p.getAttribute('data-divisi')) === id);
     });
@@ -719,7 +724,7 @@ function switchDivisi(btn) {
 }
 
 (function initBadge() {
-    var ab = document.querySelector('.divisi-btn.active-oz,.divisi-btn.active-hair');
+    var ab = document.querySelector('.divisi-btn.is-active');
     if (ab) switchDivisi(ab);
 }());
 

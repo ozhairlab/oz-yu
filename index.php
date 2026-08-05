@@ -415,7 +415,10 @@ $pasien_baru = $koneksi->query(
                         <p style="color:var(--text-light);font-size:.85rem;text-align:center;padding:20px 0;">Belum ada aktivitas treatment.</p>
                     <?php else: ?>
                         <?php foreach ($recent as $r):
-                            $bc = $r['divisi_kode'] === 'ozthetique' ? 'badge-oz' : 'badge-hair';
+                            $divisi_warna = ui_hex($r['divisi_warna'] ?? null, '#64748b');
+                            $divisi_badge_style = 'background:' . ui_hex_alpha($divisi_warna, '14') . ';'
+                                . 'color:' . $divisi_warna . ';'
+                                . 'border:1px solid ' . ui_hex_alpha($divisi_warna, '33') . ';';
                         ?>
                         <a href="detail_pasien.php?id=<?= $r['pasien_id'] ?>" class="activity-item">
                             <div class="activity-dot">
@@ -426,8 +429,8 @@ $pasien_baru = $koneksi->query(
                                 <div class="activity-sub">
                                     <span><?= htmlspecialchars($r['pasien_nama']) ?></span>
                                     <?php if ($r['divisi_nama']): ?>
-                                        <span class="divisi-badge-inline <?= $bc ?>" style="padding:1px 8px;font-size:.65rem;">
-                                            <span class="dot" style="width:5px;height:5px;background:<?= htmlspecialchars($r['divisi_warna'] ?? '#ec4899') ?>"></span>
+                                        <span class="divisi-badge-inline" style="padding:1px 8px;font-size:.65rem;<?= htmlspecialchars($divisi_badge_style) ?>">
+                                            <span class="dot" style="width:5px;height:5px;background:<?= htmlspecialchars($divisi_warna) ?>"></span>
                                             <?= htmlspecialchars($r['divisi_nama']) ?>
                                         </span>
                                     <?php endif; ?>
@@ -723,8 +726,9 @@ $pasien_baru = $koneksi->query(
                     html += '<span class="treatment-nama">' + escHtml(t.nama_treatment) + '</span>';
                     html += '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">';
                     if (t.divisi_kode) {
-                        var bc = t.divisi_kode === 'ozthetique' ? 'badge-oz' : 'badge-hair';
-                        html += '<span class="divisi-badge-inline '+bc+'"><span class="dot"></span>'+escHtml(t.divisi_nama)+'</span>';
+                        var warna = /^#[0-9a-fA-F]{6}$/.test(String(t.divisi_warna || '')) ? t.divisi_warna : '#64748b';
+                        html += '<span class="divisi-badge-inline" style="background:'+warna+'14;color:'+warna+';border:1px solid '+warna+'33;">' +
+                            '<span class="dot" style="background:'+warna+'"></span>'+escHtml(t.divisi_nama)+'</span>';
                     }
                     html += '<span class="treatment-badge">📅 ' + escHtml(t.tanggal_treatment) + '</span>';
                     html += '</div></div>';

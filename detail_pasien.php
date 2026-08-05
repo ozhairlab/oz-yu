@@ -577,9 +577,14 @@ $active_menu     = 'pasien';
                     </div>
                     <div class="visit-badges">
                         <?php if ($t['divisi_kode']): ?>
-                            <?php $bc = $t['divisi_kode'] === 'ozthetique' ? 'badge-oz' : 'badge-hair'; ?>
-                            <span class="divisi-badge-inline <?= $bc ?>">
-                                <span class="dot" style="background:<?= htmlspecialchars($t['divisi_warna']) ?>"></span>
+                            <?php
+                                $divisi_warna = ui_hex($t['divisi_warna'] ?? null, '#64748b');
+                                $divisi_badge_style = 'background:' . ui_hex_alpha($divisi_warna, '14') . ';'
+                                    . 'color:' . $divisi_warna . ';'
+                                    . 'border:1px solid ' . ui_hex_alpha($divisi_warna, '33') . ';';
+                            ?>
+                            <span class="divisi-badge-inline" style="<?= htmlspecialchars($divisi_badge_style) ?>">
+                                <span class="dot" style="background:<?= htmlspecialchars($divisi_warna) ?>"></span>
                                 <?= htmlspecialchars($t['divisi_nama']) ?>
                             </span>
                         <?php endif; ?>

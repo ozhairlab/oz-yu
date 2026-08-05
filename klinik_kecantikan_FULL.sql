@@ -67,13 +67,14 @@ CREATE TABLE `divisi` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_kode` (`kode`)
 ) ENGINE=InnoDB
-  AUTO_INCREMENT=3
+  AUTO_INCREMENT=4
   DEFAULT CHARSET=utf8mb4
   COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO `divisi` (`id`, `kode`, `nama`, `warna`, `urutan`) VALUES
 (1, 'ozthetique', 'Ozthetique', '#e91e63', 1),
-(2, 'ozhairlab',  'OzHairLab',  '#7c4dff', 2);
+(2, 'ozhairlab',  'OzHairLab',  '#7c4dff', 2),
+(3, 'dental',     'Dental',     '#0ea5e9', 3);
 
 -- ============================================================
 -- TABEL 3: pasien
@@ -117,7 +118,7 @@ CREATE TABLE `master_perawatan` (
     FOREIGN KEY (`divisi_id`) REFERENCES `divisi` (`id`)
     ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB
-  AUTO_INCREMENT=21
+  AUTO_INCREMENT=22
   DEFAULT CHARSET=utf8mb4
   COLLATE=utf8mb4_unicode_ci;
 
@@ -143,7 +144,9 @@ INSERT INTO `master_perawatan` (`id`, `divisi_id`, `nama`, `aktif`, `urutan`) VA
 (17, 2, 'Highlight',             1,  7),
 (18, 2, 'Balayage',              1,  8),
 (19, 2, 'Cutting & Styling',     1,  9),
-(20, 2, 'PRP Hair Treatment',    1, 10);
+(20, 2, 'PRP Hair Treatment',   1, 10),
+-- Dental
+(21, 3, 'Dental',               1,  1);
 
 -- ============================================================
 -- TABEL 5: riwayat_treatment

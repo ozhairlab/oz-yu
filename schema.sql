@@ -39,7 +39,8 @@ CREATE TABLE IF NOT EXISTS `divisi` (
 
 INSERT IGNORE INTO `divisi` (`kode`, `nama`, `warna`, `urutan`) VALUES
   ('ozthetique', 'Ozthetique', '#e91e63', 1),
-  ('ozhairlab',  'OzHairLab',  '#7c4dff', 2);
+  ('ozhairlab',  'OzHairLab',  '#7c4dff', 2),
+  ('dental',     'Dental',     '#0ea5e9', 3);
 
 -- ------------------------------------------------------------
 -- 3. pasien
@@ -82,7 +83,8 @@ INSERT IGNORE INTO `master_perawatan` (`id`,`divisi_id`,`nama`,`urutan`) VALUES
   (13,2,'Keratin Treatment',3),(14,2,'Hair Botox',4),
   (15,2,'Smoothing',5),(16,2,'Coloring',6),
   (17,2,'Highlight',7),(18,2,'Balayage',8),
-  (19,2,'Cutting & Styling',9),(20,2,'PRP Hair Treatment',10);
+  (19,2,'Cutting & Styling',9),(20,2,'PRP Hair Treatment',10),
+  (21,3,'Dental',1);
 
 -- ------------------------------------------------------------
 -- 5. riwayat_treatment

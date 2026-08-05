@@ -182,11 +182,12 @@ $active_tab = (int)($_GET['tab'] ?? $divisi_list[0]['id'] ?? 1);
             opacity: .4;
         }
 
-        .divisi-tab.active-oz  { background: var(--primary-100); color: var(--primary); border-color: var(--primary-200); }
-        .divisi-tab.active-oz .tab-dot  { opacity: 1; background: var(--primary); }
-
-        .divisi-tab.active-hair { background: #ede7f6; color: #7c4dff; border-color: #d1c4e9; }
-        .divisi-tab.active-hair .tab-dot { opacity: 1; background: #7c4dff; }
+        .divisi-tab.active-dynamic {
+            color: var(--tab-color, var(--text));
+            background: var(--tab-bg, #f8f8fc);
+            border-color: var(--tab-border, var(--border));
+        }
+        .divisi-tab.active-dynamic .tab-dot { opacity: 1; background: currentColor; }
 
         /* ---- Tabel master ---- */
         .master-table { width: 100%; border-collapse: collapse; }
@@ -296,8 +297,7 @@ $active_tab = (int)($_GET['tab'] ?? $divisi_list[0]['id'] ?? 1);
         .divisi-stat .val { font-size: 1.4rem; font-weight: 700; }
         .divisi-stat .lbl { font-size: .72rem; margin-top: 2px; opacity: .75; }
 
-        .ds-oz   { background: var(--primary-100); color: var(--primary-dark); }
-        .ds-hair { background: #ede7f6; color: #6a1b9a; }
+        .ds-dynamic { background: var(--stat-bg, #f8fafc); color: var(--stat-color, #334155); }
 
         /* ---- Modal edit (sederhana) ---- */
         .modal-backdrop {
@@ -378,14 +378,13 @@ $active_tab = (int)($_GET['tab'] ?? $divisi_list[0]['id'] ?? 1);
             <!-- Tab divisi -->
             <div class="divisi-tabs">
                 <?php foreach ($divisi_list as $d):
-                    $is_oz   = $d['kode'] === 'ozthetique';
-                    $cls_tab = ($active_tab == $d['id'])
-                        ? ($is_oz ? 'active-oz' : 'active-hair')
-                        : '';
+                    $warna   = ui_hex($d['warna'], '#64748b');
+                    $cls_tab = ($active_tab == $d['id']) ? 'active-dynamic' : '';
                     $total   = count($perawatan_per_divisi[$d['id']] ?? []);
                 ?>
                     <a href="?tab=<?= $d['id'] ?>"
-                       class="divisi-tab <?= $cls_tab ?>">
+                       class="divisi-tab <?= $cls_tab ?>"
+                       style="--tab-color:<?= htmlspecialchars($warna) ?>;--tab-bg:<?= htmlspecialchars(ui_hex_alpha($warna, '14')) ?>;--tab-border:<?= htmlspecialchars(ui_hex_alpha($warna, '33')) ?>;">
                         <span class="tab-dot" style="background:<?= htmlspecialchars($d['warna']) ?>"></span>
                         <?= htmlspecialchars($d['nama']) ?>
                         <span style="font-size:.7rem;opacity:.7">(<?= $total ?>)</span>
@@ -396,9 +395,8 @@ $active_tab = (int)($_GET['tab'] ?? $divisi_list[0]['id'] ?? 1);
             <!-- Tabel perawatan tab aktif -->
             <?php foreach ($divisi_list as $d):
                 if ($d['id'] != $active_tab) continue;
-                $is_oz = $d['kode'] === 'ozthetique';
                 $rows  = $perawatan_per_divisi[$d['id']] ?? [];
-                $warna = $d['warna'];
+                $warna = ui_hex($d['warna'], '#64748b');
             ?>
                 <div class="card" style="padding:0;overflow:hidden;">
                     <div style="padding:16px 20px;border-bottom:1px solid var(--border);
@@ -547,9 +545,10 @@ $active_tab = (int)($_GET['tab'] ?? $divisi_list[0]['id'] ?? 1);
                     <?php foreach ($divisi_list as $d):
                         $rows = $perawatan_per_divisi[$d['id']] ?? [];
                         $aktif_count = count(array_filter($rows, fn($r) => $r['aktif']));
-                        $cls = $d['kode'] === 'ozthetique' ? 'ds-oz' : 'ds-hair';
+                        $warna = ui_hex($d['warna'], '#64748b');
                     ?>
-                        <div class="divisi-stat <?= $cls ?>">
+                        <div class="divisi-stat ds-dynamic"
+                             style="--stat-bg:<?= htmlspecialchars(ui_hex_alpha($warna, '14')) ?>;--stat-color:<?= htmlspecialchars($warna) ?>;">
                             <div class="val"><?= $aktif_count ?> / <?= count($rows) ?></div>
                             <div class="lbl"><?= htmlspecialchars($d['nama']) ?></div>
                         </div>
