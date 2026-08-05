@@ -186,7 +186,7 @@ $katalog_json = json_encode($katalog);
         .patient-name { font-weight: 600; color: var(--gold-dark); }
         .btn-clear { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 0.8rem; font-weight: bold; }
         
-        .cart-items { flex: 1; overflow-y: auto; padding: 20px; }
+        .cart-items { flex: 0 1 auto; max-height: 40vh; overflow-y: auto; padding: 20px; }
         .cart-item { display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; margin-bottom: 16px; border-bottom: 1px dashed var(--border); }
         .item-info { flex: 1; }
         .item-name { font-weight: 600; font-size: 0.95rem; margin-bottom: 4px; }

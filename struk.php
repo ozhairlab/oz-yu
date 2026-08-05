@@ -154,6 +154,14 @@ $stmt->close();
             </div>
         </div>
     </div>
-
+    <script>
+        window.onload = function() {
+            window.print();
+        }
+        window.onafterprint = function() {
+            // Opsional: kembali ke POS otomatis
+            // window.location.href = 'pos.php';
+        }
+    </script>
 </body>
 </html>
