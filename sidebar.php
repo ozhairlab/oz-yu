@@ -59,6 +59,7 @@ $admin_init  = strtoupper(mb_substr($_SESSION['admin_username'] ?? 'A', 0, 1));
             <span class="nav-label">Dashboard</span>
         </a>
 
+        <?php if (is_role(['superadmin', 'kasir', 'admin_medis'])): ?>
         <a href="pasien.php"
            class="nav-item <?= $active_menu === 'pasien' ? 'active' : '' ?>">
             <span class="nav-icon">
@@ -70,7 +71,9 @@ $admin_init  = strtoupper(mb_substr($_SESSION['admin_username'] ?? 'A', 0, 1));
             </span>
             <span class="nav-label">Daftar Pasien</span>
         </a>
+        <?php endif; ?>
 
+        <?php if (is_role(['superadmin', 'admin_medis'])): ?>
         <a href="tambah_treatment.php"
            class="nav-item <?= $active_menu === 'treatment' ? 'active' : '' ?>">
             <span class="nav-icon">
@@ -80,7 +83,27 @@ $admin_init  = strtoupper(mb_substr($_SESSION['admin_username'] ?? 'A', 0, 1));
             </span>
             <span class="nav-label">Catat Treatment</span>
         </a>
+        <?php endif; ?>
 
+        <?php if (is_role(['superadmin', 'kasir'])): ?>
+        <a href="pos.php"
+           class="nav-item <?= $active_menu === 'pos' ? 'active' : '' ?>">
+            <span class="nav-icon">
+                <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
+            </span>
+            <span class="nav-label">POS Kasir</span>
+        </a>
+
+        <a href="riwayat_transaksi.php"
+           class="nav-item <?= $active_menu === 'transaksi' ? 'active' : '' ?>">
+            <span class="nav-icon">
+                <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+            </span>
+            <span class="nav-label">Riwayat Transaksi</span>
+        </a>
+        <?php endif; ?>
+
+        <?php if (is_role(['superadmin'])): ?>
         <a href="master_perawatan.php"
            class="nav-item <?= $active_menu === 'master' ? 'active' : '' ?>">
             <span class="nav-icon">
@@ -90,6 +113,14 @@ $admin_init  = strtoupper(mb_substr($_SESSION['admin_username'] ?? 'A', 0, 1));
             <span class="nav-label">Master Perawatan</span>
         </a>
 
+        <a href="users.php"
+           class="nav-item <?= $active_menu === 'users' ? 'active' : '' ?>">
+            <span class="nav-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            </span>
+            <span class="nav-label">Manajemen Pengguna</span>
+        </a>
+
         <a href="crm_bulk.php"
            class="nav-item <?= $active_menu === 'crm' ? 'active' : '' ?>">
             <span class="nav-icon">
@@ -97,6 +128,7 @@ $admin_init  = strtoupper(mb_substr($_SESSION['admin_username'] ?? 'A', 0, 1));
             </span>
             <span class="nav-label">Import CRM</span>
         </a>
+        <?php endif; ?>
     </nav>
 
     <!-- Spacer -->

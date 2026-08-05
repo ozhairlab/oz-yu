@@ -27,6 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $divisi_id  = (int)($_POST['divisi_id'] ?? 0);
         $nama       = trim($_POST['nama'] ?? '');
         $deskripsi  = trim($_POST['deskripsi'] ?? '');
+        $harga      = (float)($_POST['harga'] ?? 0);
 
         if ($divisi_id <= 0)   $errors[] = 'Pilih divisi.';
         if ($nama === '')       $errors[] = 'Nama perawatan wajib diisi.';
@@ -43,10 +44,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt_max->close();
 
             $stmt = $koneksi->prepare(
-                'INSERT INTO master_perawatan (divisi_id,nama,deskripsi,urutan) VALUES (?,?,?,?)'
+                'INSERT INTO master_perawatan (divisi_id,nama,deskripsi,urutan,harga) VALUES (?,?,?,?,?)'
             );
             $desk_val = $deskripsi ?: null;
-            $stmt->bind_param('issi', $divisi_id, $nama, $desk_val, $urutan);
+            $stmt->bind_param('issid', $divisi_id, $nama, $desk_val, $urutan, $harga);
             if ($stmt->execute()) {
                 $sukses = 'Perawatan berhasil ditambahkan.';
             } else {
@@ -62,6 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $divisi_id  = (int)($_POST['divisi_id'] ?? 0);
         $nama       = trim($_POST['nama'] ?? '');
         $deskripsi  = trim($_POST['deskripsi'] ?? '');
+        $harga      = (float)($_POST['harga'] ?? 0);
 
         if ($id <= 0)           $errors[] = 'ID tidak valid.';
         if ($divisi_id <= 0)    $errors[] = 'Pilih divisi.';
@@ -69,10 +71,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (empty($errors)) {
             $stmt = $koneksi->prepare(
-                'UPDATE master_perawatan SET divisi_id=?,nama=?,deskripsi=? WHERE id=?'
+                'UPDATE master_perawatan SET divisi_id=?,nama=?,deskripsi=?,harga=? WHERE id=?'
             );
             $desk_val = $deskripsi ?: null;
-            $stmt->bind_param('issi', $divisi_id, $nama, $desk_val, $id);
+            $stmt->bind_param('issdi', $divisi_id, $nama, $desk_val, $harga, $id);
             if ($stmt->execute()) {
                 $sukses = 'Perawatan berhasil diperbarui.';
             } else {
@@ -128,7 +130,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $perawatan_per_divisi = [];
 foreach ($divisi_list as $d) {
     $stmt = $koneksi->prepare(
-        'SELECT id, nama, deskripsi, aktif, urutan FROM master_perawatan
+        'SELECT id, nama, deskripsi, aktif, urutan, harga FROM master_perawatan
          WHERE divisi_id = ? ORDER BY urutan ASC, nama ASC'
     );
     $stmt->bind_param('i', $d['id']);
@@ -431,6 +433,7 @@ $active_tab = (int)($_GET['tab'] ?? $divisi_list[0]['id'] ?? 1);
                                         <th style="width:40px">#</th>
                                         <th>Nama Perawatan</th>
                                         <th>Deskripsi</th>
+                                        <th style="width:120px">Harga (Rp)</th>
                                         <th style="width:90px">Status</th>
                                         <th style="width:160px">Aksi</th>
                                     </tr>
@@ -445,6 +448,7 @@ $active_tab = (int)($_GET['tab'] ?? $divisi_list[0]['id'] ?? 1);
                                                 ? htmlspecialchars(mb_substr($p['deskripsi'], 0, 60)).(mb_strlen($p['deskripsi']) > 60 ? '…' : '')
                                                 : '<span style="color:#ddd">—</span>' ?>
                                         </td>
+                                        <td style="font-weight:600;color:#c9a96e"><?= number_format($p['harga'], 0, ',', '.') ?></td>
                                         <td>
                                             <span class="badge-aktif <?= $p['aktif'] ? 'on' : 'off' ?>">
                                                 <?= $p['aktif'] ? 'Aktif' : 'Nonaktif' ?>
@@ -456,7 +460,8 @@ $active_tab = (int)($_GET['tab'] ?? $divisi_list[0]['id'] ?? 1);
                                                     class="btn btn-sm btn-edit"
                                                     onclick="bukaEdit(<?= $p['id'] ?>,<?= $d['id'] ?>,
                                                         '<?= addslashes(htmlspecialchars($p['nama'])) ?>',
-                                                        '<?= addslashes(htmlspecialchars($p['deskripsi'] ?? '')) ?>')">
+                                                        '<?= addslashes(htmlspecialchars($p['deskripsi'] ?? '')) ?>',
+                                                        <?= (float)$p['harga'] ?>)">
                                                     Edit
                                                 </button>
                                                 <form method="POST" style="display:inline"
@@ -523,6 +528,15 @@ $active_tab = (int)($_GET['tab'] ?? $divisi_list[0]['id'] ?? 1);
                     </div>
 
                     <div class="form-group">
+                        <label class="form-label" for="harga_baru">
+                            Harga (Rp) <span class="req">*</span>
+                        </label>
+                        <input type="number" id="harga_baru" name="harga"
+                               class="form-control" min="0" step="500"
+                               placeholder="0" required>
+                    </div>
+
+                    <div class="form-group">
                         <label class="form-label" for="deskripsi_baru">Deskripsi</label>
                         <textarea id="deskripsi_baru" name="deskripsi"
                                   class="form-control" rows="3"
@@ -584,6 +598,12 @@ $active_tab = (int)($_GET['tab'] ?? $divisi_list[0]['id'] ?? 1);
             </div>
 
             <div class="form-group">
+                <label class="form-label">Harga (Rp) <span class="req">*</span></label>
+                <input type="number" name="harga" id="edit_harga"
+                       class="form-control" min="0" step="500" required>
+            </div>
+
+            <div class="form-group">
                 <label class="form-label">Deskripsi</label>
                 <textarea name="deskripsi" id="edit_deskripsi"
                           class="form-control" rows="3"></textarea>
@@ -612,10 +632,11 @@ $active_tab = (int)($_GET['tab'] ?? $divisi_list[0]['id'] ?? 1);
     });
 }());
 
-function bukaEdit(id, divisiId, nama, deskripsi) {
+function bukaEdit(id, divisiId, nama, deskripsi, harga) {
     document.getElementById('edit_id').value        = id;
     document.getElementById('edit_divisi_id').value = divisiId;
     document.getElementById('edit_nama').value      = nama;
+    document.getElementById('edit_harga').value     = harga;
     document.getElementById('edit_deskripsi').value = deskripsi;
     document.getElementById('modalEdit').classList.add('show');
 }

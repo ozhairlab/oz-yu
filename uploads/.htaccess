@@ -1,0 +1,21 @@
+# ============================================================
+#  uploads/.htaccess
+#  Blokir eksekusi PHP/script di dalam folder uploads
+#  agar file yang diupload tidak bisa dijalankan sebagai kode.
+# ============================================================
+
+# Nonaktifkan eksekusi PHP
+php_flag engine off
+
+# Tolak akses ke file selain gambar
+<FilesMatch "(?i)\.(php\d?|phtml|pl|py|cgi|sh|bash|asp|aspx|jsp|cfm)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Paksa file diunduh / ditampilkan sebagai gambar, bukan dieksekusi
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+</IfModule>
+
+Options -Indexes

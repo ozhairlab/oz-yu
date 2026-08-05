@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Username dan password wajib diisi.';
     } else {
         $stmt = $koneksi->prepare(
-            'SELECT id, username, password FROM admin_klinik WHERE username = ? LIMIT 1'
+            'SELECT id, username, password, role FROM admin_klinik WHERE username = ? LIMIT 1'
         );
         $stmt->bind_param('s', $username);
         $stmt->execute();
@@ -30,6 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             session_regenerate_id(true);
             $_SESSION['admin_id']       = $admin['id'];
             $_SESSION['admin_username'] = $admin['username'];
+            $_SESSION['admin_role']     = $admin['role'] ?? 'superadmin';
             header('Location: index.php');
             exit;
         } else {
