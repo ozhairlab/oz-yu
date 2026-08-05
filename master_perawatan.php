@@ -49,7 +49,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $desk_val = $deskripsi ?: null;
             $stmt->bind_param('issid', $divisi_id, $nama, $desk_val, $urutan, $harga);
             if ($stmt->execute()) {
+                $new_id = $stmt->insert_id;
                 $sukses = 'Perawatan berhasil ditambahkan.';
+                
+                $k_barang = $_POST['komposisi_barang_id'] ?? [];
+                $k_jumlah = $_POST['komposisi_jumlah'] ?? [];
+                if (!empty($k_barang)) {
+                    $stmt_k = $koneksi->prepare('INSERT INTO komposisi_perawatan (perawatan_id, barang_id, jumlah_pakai) VALUES (?, ?, ?)');
+                    for ($i = 0; $i < count($k_barang); $i++) {
+                        $bid = (int)$k_barang[$i];
+                        $qty = (int)($k_jumlah[$i] ?? 0);
+                        if ($bid > 0 && $qty > 0) {
+                            $stmt_k->bind_param('iii', $new_id, $bid, $qty);
+                            $stmt_k->execute();
+                        }
+                    }
+                    $stmt_k->close();
+                }
             } else {
                 $errors[] = 'Gagal menyimpan: ' . $stmt->error;
             }
@@ -77,6 +93,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->bind_param('issdi', $divisi_id, $nama, $desk_val, $harga, $id);
             if ($stmt->execute()) {
                 $sukses = 'Perawatan berhasil diperbarui.';
+                
+                $koneksi->query("DELETE FROM komposisi_perawatan WHERE perawatan_id = $id");
+                $k_barang = $_POST['komposisi_barang_id'] ?? [];
+                $k_jumlah = $_POST['komposisi_jumlah'] ?? [];
+                if (!empty($k_barang)) {
+                    $stmt_k = $koneksi->prepare('INSERT INTO komposisi_perawatan (perawatan_id, barang_id, jumlah_pakai) VALUES (?, ?, ?)');
+                    for ($i = 0; $i < count($k_barang); $i++) {
+                        $bid = (int)$k_barang[$i];
+                        $qty = (int)($k_jumlah[$i] ?? 0);
+                        if ($bid > 0 && $qty > 0) {
+                            $stmt_k->bind_param('iii', $id, $bid, $qty);
+                            $stmt_k->execute();
+                        }
+                    }
+                    $stmt_k->close();
+                }
             } else {
                 $errors[] = 'Gagal memperbarui: ' . $stmt->error;
             }
@@ -126,6 +158,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+// --- Ambil semua inventory ---
+$inventory_list = [];
+$res_inv = $koneksi->query('SELECT id, nama, satuan FROM inventory_barang ORDER BY nama ASC');
+while ($r = $res_inv->fetch_assoc()) $inventory_list[] = $r;
+$inventory_json = json_encode($inventory_list);
+
 // --- Ambil perawatan dikelompokkan per divisi ---
 $perawatan_per_divisi = [];
 foreach ($divisi_list as $d) {
@@ -137,7 +175,13 @@ foreach ($divisi_list as $d) {
     $stmt->execute();
     $res = $stmt->get_result();
     $rows = [];
-    while ($row = $res->fetch_assoc()) $rows[] = $row;
+    while ($row = $res->fetch_assoc()) {
+        $rk = $koneksi->query("SELECT barang_id, jumlah_pakai FROM komposisi_perawatan WHERE perawatan_id = " . $row['id']);
+        $komposisi = [];
+        while($k = $rk->fetch_assoc()) $komposisi[] = $k;
+        $row['komposisi'] = $komposisi;
+        $rows[] = $row;
+    }
     $stmt->close();
     $perawatan_per_divisi[$d['id']] = $rows;
 }
@@ -458,13 +502,13 @@ $active_tab = (int)($_GET['tab'] ?? $divisi_list[0]['id'] ?? 1);
                                             <div class="tbl-actions">
                                                 <button type="button"
                                                     class="btn btn-sm btn-edit"
-                                                    onclick="bukaEdit(<?= $p['id'] ?>,<?= $d['id'] ?>,
+                                                    data-komposisi="<?= htmlspecialchars(json_encode($p['komposisi']), ENT_QUOTES, 'UTF-8') ?>"
+                                                    onclick="bukaEdit(this, <?= $p['id'] ?>, <?= $d['id'] ?>,
                                                         '<?= addslashes(htmlspecialchars($p['nama'])) ?>',
                                                         '<?= addslashes(htmlspecialchars($p['deskripsi'] ?? '')) ?>',
                                                         <?= (float)$p['harga'] ?>)">
                                                     Edit
                                                 </button>
-                                                <a href="komposisi.php?id=<?= $p['id'] ?>" class="btn btn-sm" style="background:#fff7ed; color:#ea580c; border:1px solid #ffedd5; text-decoration:none;">Bahan</a>
                                                 <form method="POST" style="display:inline"
                                                       onsubmit="return confirm('Ubah status perawatan ini?')">
                                                     <input type="hidden" name="aksi" value="toggle">
@@ -544,6 +588,14 @@ $active_tab = (int)($_GET['tab'] ?? $divisi_list[0]['id'] ?? 1);
                                   placeholder="Keterangan singkat (opsional)"></textarea>
                     </div>
 
+                    <div class="form-group" style="background: #f8fafc; padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+                        <label class="form-label" style="margin-bottom: 8px;">Komposisi / Bahan yang Dipakai</label>
+                        <div id="komposisi_tambah_container"></div>
+                        <button type="button" class="btn btn-sm btn-toggle" onclick="addKomposisiRow('komposisi_tambah_container')" style="margin-top: 8px; width: 100%;">
+                            + Tambah Bahan
+                        </button>
+                    </div>
+
                     <button type="submit" class="btn btn-primary btn-full">
                         <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
                         Simpan Perawatan
@@ -610,6 +662,14 @@ $active_tab = (int)($_GET['tab'] ?? $divisi_list[0]['id'] ?? 1);
                           class="form-control" rows="3"></textarea>
             </div>
 
+            <div class="form-group" style="background: #f8fafc; padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+                <label class="form-label" style="margin-bottom: 8px;">Komposisi / Bahan yang Dipakai</label>
+                <div id="komposisi_edit_container"></div>
+                <button type="button" class="btn btn-sm btn-toggle" onclick="addKomposisiRow('komposisi_edit_container')" style="margin-top: 8px; width: 100%;">
+                    + Tambah Bahan
+                </button>
+            </div>
+
             <div class="modal-actions">
                 <button type="button" class="btn btn-secondary" onclick="tutupModal()">Batal</button>
                 <button type="submit" class="btn btn-primary" style="flex:1">Simpan Perubahan</button>
@@ -633,12 +693,52 @@ $active_tab = (int)($_GET['tab'] ?? $divisi_list[0]['id'] ?? 1);
     });
 }());
 
-function bukaEdit(id, divisiId, nama, deskripsi, harga) {
+const inventoryData = <?= $inventory_json ?>;
+
+function addKomposisiRow(containerId, selectedBarangId = '', qty = 1) {
+    const container = document.getElementById(containerId);
+    const row = document.createElement('div');
+    row.style.display = 'flex';
+    row.style.gap = '8px';
+    row.style.marginBottom = '8px';
+    row.style.alignItems = 'center';
+
+    let optionsHTML = '<option value="">— Pilih Bahan —</option>';
+    inventoryData.forEach(item => {
+        const selected = (item.id == selectedBarangId) ? 'selected' : '';
+        optionsHTML += `<option value="${item.id}" ${selected}>${item.nama} (${item.satuan})</option>`;
+    });
+
+    row.innerHTML = `
+        <select name="komposisi_barang_id[]" class="form-control" style="flex: 1;" required>
+            ${optionsHTML}
+        </select>
+        <input type="number" name="komposisi_jumlah[]" class="form-control" style="width: 80px;" min="1" value="${qty}" required placeholder="Qty">
+        <button type="button" class="btn btn-sm btn-hapus" onclick="this.parentElement.remove()" style="padding: 8px 12px;" title="Hapus">✕</button>
+    `;
+    container.appendChild(row);
+}
+
+function bukaEdit(btn, id, divisiId, nama, deskripsi, harga) {
     document.getElementById('edit_id').value        = id;
     document.getElementById('edit_divisi_id').value = divisiId;
     document.getElementById('edit_nama').value      = nama;
     document.getElementById('edit_harga').value     = harga;
     document.getElementById('edit_deskripsi').value = deskripsi;
+    
+    // Render komposisi
+    const container = document.getElementById('komposisi_edit_container');
+    container.innerHTML = '';
+    
+    try {
+        const komposisi = JSON.parse(btn.getAttribute('data-komposisi') || '[]');
+        komposisi.forEach(k => {
+            addKomposisiRow('komposisi_edit_container', k.barang_id, k.jumlah_pakai);
+        });
+    } catch (e) {
+        console.error("Gagal memparsing komposisi", e);
+    }
+    
     document.getElementById('modalEdit').classList.add('show');
 }
 
