@@ -383,7 +383,9 @@ $katalog_json = json_encode($katalog);
             }
             
             searchTimeout = setTimeout(() => {
-                fetch('proses_cari.php?q=' + encodeURIComponent(val))
+                fetch('proses_cari.php?q=' + encodeURIComponent(val), {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
                 .then(res => res.json())
                 .then(data => {
                     resultsBox.innerHTML = '';
