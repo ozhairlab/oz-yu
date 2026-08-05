@@ -394,10 +394,16 @@ $katalog_json = json_encode($katalog);
                 .then(res => res.json())
                 .then(data => {
                     resultsBox.innerHTML = '';
-                    if(data.length === 0) {
-                        resultsBox.innerHTML = '<div class="search-item"><small>Tidak ditemukan</small></div>';
+                    let pasienList = data.pasien || [];
+                    if(pasienList.length === 0) {
+                        resultsBox.innerHTML = `
+                            <div class="search-item" style="text-align:center; padding: 15px;">
+                                <div style="margin-bottom: 8px; color: var(--muted);">Pasien tidak ditemukan.</div>
+                                <a href="tambah_pasien.php" target="_blank" style="display: inline-block; padding: 6px 12px; background: var(--gold); color: #000; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 0.85rem;">+ Daftar Pasien Baru</a>
+                            </div>
+                        `;
                     } else {
-                        data.forEach(p => {
+                        pasienList.forEach(p => {
                             let div = document.createElement('div');
                             div.className = 'search-item';
                             div.innerHTML = `<strong>${p.nama}</strong><small>${p.telepon || '-'} | Lahir: ${p.tanggal_lahir || '-'}</small>`;
